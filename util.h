@@ -19,9 +19,6 @@ vector<float> dividir_vector (vector<float> & a, float divisor);
 
 float norma2 (vector<float> & a);
 
-int signo (float a) {
-    if (a > 0) return 1;
-    else       return -1;
-}
+int signo (float a);
 
 #endif

@@ -85,3 +85,8 @@ float norma2 (vector<float> & a) {
     }
     return sqrt(accum);
 }
+
+int signo (float a) {
+    if (a > 0) return 1;
+    else       return -1;
+}
