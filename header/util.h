@@ -6,6 +6,7 @@
 using namespace std;
 
 int randomize (int lower, int upper);
+float randomize (float lower, float upper);
 
 bool comparar_vectores (vector<float> & a, vector<float> & b);
 
