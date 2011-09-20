@@ -22,4 +22,6 @@ float norma2 (vector<float> & a);
 
 int signo (float a);
 
+void imprimir_vector (vector<float> & a);
+
 #endif

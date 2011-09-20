@@ -5,7 +5,7 @@
 
 using namespace std;
 
-neurona_rbf::neurona_rbf(size_t size):centroid(size), varianza(1){}
+neurona_rbf::neurona_rbf(int size, float varianza): centroid(size), varianza(varianza) {}
 
 float neurona_rbf::calcular (vector<float> & entrada) {
     float dist;
@@ -27,9 +27,7 @@ bool neurona_rbf::set_centroid (vector<float> & new_centroid) {
 }
 
 float neurona_rbf::gaussian (float x) {
-    float value = exp(-((x*x)/(2*varianza)));
-	cerr << x*x/(2*varianza) << ' ' << value << '\n';
-	return value;
+    return exp(-((x*x)/(2*varianza)));
 }
     
 float neurona_rbf::distancia2(vector<float> & punto) {
@@ -43,3 +41,9 @@ void neurona_rbf::graph() const{
 	cout << centroid[0] << ' ' << centroid[1] << endl;
 }
 
+void neurona_rbf::imprimir_centroide() {
+    for (int i = 0; i < centroid.size(); i++) {
+        cout << centroid[i] << " ";
+    }
+    cout << endl;
+}

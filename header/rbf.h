@@ -10,7 +10,7 @@ using namespace std;
 
 class RBF {
 public:
-    RBF (int neuronas_capa_gaussiana, int neuronas_capa_salida, int n_entradas, float eta);
+    RBF (int n_entradas, int neuronas_capa_gaussiana, int neuronas_capa_salida, float eta);
     vector<float> calcular_intermedio (vector<float> & entrada);
     vector<float> calcular_salida_con_intermedio (vector<float> & intermedio);
     vector<float> calcular_salida (vector<float> & entrada);
@@ -19,8 +19,9 @@ public:
     void entrenar_capa_gaussiana ();
     int entrenar_capa_salida (int cant_epocas, float acierto_minimo);
     int centroide_mas_cerca (vector<float> & punto);
-
-	void graph() const;
+    void graph() const;
+    void prueba ();
+    void imprimir_centroides ();
 
 private:
     vector<neurona_rbf> capa_gaussiana;

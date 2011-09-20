@@ -6,8 +6,8 @@
 
 using namespace std;
 
-RBF::RBF (int neuronas_capa_gaussiana, int neuronas_capa_salida, int n_entradas, float eta) {
-    capa_gaussiana.resize(neuronas_capa_gaussiana, neurona_rbf(n_entradas) ); 
+RBF::RBF (int n_entradas, int neuronas_capa_gaussiana, int neuronas_capa_salida, float eta) {
+    capa_gaussiana.resize(neuronas_capa_gaussiana, neurona_rbf(n_entradas, 1) ); 
     capa_salida.resize(
             neuronas_capa_salida, 
             neurona(neuronas_capa_gaussiana, eta) // inicializacion de la neurona
@@ -29,7 +29,6 @@ vector<float> RBF::calcular_intermedio (vector<float> & entrada) {
         intermedio[i] = capa_gaussiana[i].calcular(entrada);
     }
     intermedio[ncg] = 1; // entrada aumentada
-
     return intermedio;
 }
 
@@ -55,7 +54,6 @@ void RBF::read (const char *filename) {
 
     fstream file (filename, fstream::in);    
     file >> n;
-	cerr << "Cantidad de patrones " << n << '\n';
     input.resize(n, vector<float>(entradas));
     result.resize(n, vector<float>(ncs));
 
@@ -85,13 +83,6 @@ void RBF::entrenar_capa_gaussiana () {
     int ind;
     bool cambio;
 
-	cerr << "Inicio del entrenamiento\n" << 
-	"Neuronas en la capa gaussiana " << ncg << ' ' << capa_gaussiana.size() << '\n' <<
-	"Tamanio de la entrada " << input.size() << 'x' << input[0].size() << '\n' << 
-	"...";
-
-	
-
     while (true) {
         vector<vector<float> > centroides_acumulados(ncg, vector<float>(entradas, 0));
         vector<int> cantidad_centroides(ncg, 0);
@@ -104,15 +95,17 @@ void RBF::entrenar_capa_gaussiana () {
 
         cambio = false;
         for (int i = 0; i < ncg; i++) {
-            centroides_acumulados[i] = dividir_vector(centroides_acumulados[i], cantidad_centroides[i]);
-            // si el centroide cambia, actualizo la bandera
-            if (capa_gaussiana[i].set_centroid(centroides_acumulados[i])) cambio = true;
+            if (cantidad_centroides[i] != 0) {
+                centroides_acumulados[i] = dividir_vector(centroides_acumulados[i], cantidad_centroides[i]);
+                // si el centroide cambia, actualizo la bandera
+                if (capa_gaussiana[i].set_centroid(centroides_acumulados[i])) cambio = true;
+            }
         }
 
 		//graph();
         if (!cambio) break;
     }
-    //TODO varianza
+    //TODO calcular varianza
 }
 
 int RBF::entrenar_capa_salida (int cant_epocas, float acierto_minimo) {
@@ -124,12 +117,7 @@ int RBF::entrenar_capa_salida (int cant_epocas, float acierto_minimo) {
 
         for (int i = 0; i < input.size(); i++) { // por cada patron de entrenamiento
             intermedio = calcular_intermedio(input[i]);
-			for(size_t K=0; K<intermedio.size(); ++K)
-				cout << intermedio[K] << ' ';
-			cout << endl;
-			continue;
-            
-			salida_obtenida = calcular_salida_con_intermedio(intermedio);
+            salida_obtenida = calcular_salida_con_intermedio(intermedio);
             if (comparar_vectores(salida_obtenida, result[i])) { // si acierta
                 aciertos++;
             } 
@@ -152,6 +140,20 @@ int RBF::entrenar_capa_salida (int cant_epocas, float acierto_minimo) {
     }
 }
 
+void RBF::prueba () {
+    vector<float> salida;
+    for (int i = 0; i < input.size(); i++) { // por cada patron de entrenamiento
+        salida = calcular_salida(input[i]);
+        cout << "Entrada " << i << ":" << endl;
+        imprimir_vector(input[i]);
+        cout << "Salida esperada " << i << ":" << endl;
+        imprimir_vector(result[i]);
+        cout << "Salida " << i << ":" << endl;
+        imprimir_vector(salida);
+        cout << endl;
+    }
+}
+
 int RBF::centroide_mas_cerca (vector<float> & punto) {
     int i_min = 0;
     float dist_min, dist;
@@ -170,9 +172,13 @@ int RBF::centroide_mas_cerca (vector<float> & punto) {
 }
 
 void RBF::graph() const{
-	cerr << "Graficando ";
 	cout << ncg << endl;
 	for(size_t K=0; K<capa_gaussiana.size(); ++K)
 		capa_gaussiana[K].graph();
 }
 
+void RBF::imprimir_centroides () {
+    for (int i = 0; i < ncg; i++) {
+        capa_gaussiana[i].imprimir_centroide();
+    }
+}
