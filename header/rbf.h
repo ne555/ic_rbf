@@ -20,6 +20,8 @@ public:
     int entrenar_capa_salida (int cant_epocas, float acierto_minimo);
     int centroide_mas_cerca (vector<float> & punto);
 
+	void graph() const;
+
 private:
     vector<neurona_rbf> capa_gaussiana;
     vector<neurona> capa_salida;

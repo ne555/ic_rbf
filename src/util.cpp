@@ -19,6 +19,7 @@ bool comparar_vectores (vector<float> & a, vector<float> & b) {
 
     if (a.size() != b.size()) {
         cerr << "comparar_vectores: distinto size" << endl;
+		cerr << a.size() << ' ' << b.size() << '\n';
         throw 1;
     }
     for (int i = 0; i < a.size(); i++) {

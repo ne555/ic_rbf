@@ -21,6 +21,13 @@ const float
 	light_green[] = {0.75, 1, 0.75, 1}, 
 	light_blue[]  = {0.75, 0.75, 1, 1};
 
+enum estado { Patrones=-1, Centroide=-2 };
+
+typedef void  (*cargar_dato)(size_t);
+
+void leer_centroides(size_t n);
+void leer_patrones(size_t n);
+
 struct point{
 	float x[2];
 	float& operator[](int index){
@@ -43,6 +50,7 @@ void draw(int id);
 void draw_centroides();
 void axis(const float *color);
 void wait_for_input();
+void wait_for_centroid();
 void fixed_background();
 
 void init();
@@ -68,21 +76,21 @@ void init(){
 	const float factor=0.5;
 	glScaled(factor,factor,factor);
 	
-	glEnable(GL_STENCIL_TEST);
-	glClearStencil(1);
+	//glEnable(GL_STENCIL_TEST);
+	//glClearStencil(1);
 	glLineWidth(4);
 }
 
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT);
-	glStencilFunc(GL_EQUAL, 0, ~0);
-	glAccum(GL_RETURN, 1);
+	//glStencilFunc(GL_EQUAL, 0, ~0);
+	//glAccum(GL_RETURN, 1);
 	draw_centroides();
-	glStencilFunc(GL_EQUAL, 1, ~0);
+	//glStencilFunc(GL_EQUAL, 1, ~0);
 
+	glColor3fv(blue);
 	draw(-1);
 	glutSwapBuffers();
-
 }
 
 void fixed_background(){
@@ -93,7 +101,7 @@ void fixed_background(){
 	glStencilFunc(GL_ALWAYS, 0, ~0);
 	glStencilOp(GL_KEEP,GL_ZERO,GL_ZERO);
 
-	axis(black);
+	//axis(black);
 	glColor3fv(red); draw(1);
 	glColor3fv(dark_blue); draw(-1);
 
@@ -122,18 +130,21 @@ void reshape(int w, int h){
 void draw(int id){
 	glBegin(GL_POINTS);{
 		for(size_t K=0; K<points.size(); ++K)
-			if(clase[K] == id)
+			//if(clase[K] == id)
 				glVertex2fv(points[K].x);
 	};glEnd();
 }
 
 void draw_centroides(){
-	glPointSize(3);
+	cerr  << '*';
+	glPointSize(7);
 	glColor3fv(black);
 	glBegin(GL_POINTS);{
-		for(size_t K=0; K<points.size(); ++K)
-			glVertex2fv(points[K].x);
+		for(size_t K=0; K<centroides.size(); ++K){
+			glVertex2fv(centroides[K].x);
+		}
 	};glEnd();
+	//usleep(1e5);
 }
 
 void axis(const float *color){
@@ -148,6 +159,7 @@ void axis(const float *color){
 
 void wait_for_input(){
 	static bool first_time=true;
+	cargar_dato leer = NULL;
 	size_t n;
 	cin>>n; //compatibilidad con la prueba
 	cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -157,19 +169,37 @@ void wait_for_input(){
 		string s;
 		while(getline(cin,s)) //el programa finalizo. se hace un bypass a la entrada
 			cerr << s << endl;
-		cerr << "Fin" << endl;
-		//exit(EXIT_SUCCESS);
+		cerr << "Fin";
+		glutPostRedisplay();
+		return;
 	}
-
-	points.resize(n);
-	clase.resize(n);
-	for(size_t K=0; K<n; ++K)
-		cin>>points[K][0]>>points[K][1]>>clase[K];
-
+	switch(n){
+	case Patrones: 
+		cin>>n;
+		leer = &leer_patrones;
+		break;
+	case Centroide: 
+		cin>>n;
+		leer = &leer_centroides;
+		break;
+	}
+	leer(n);
 	if(first_time){
-		first_time=false;
 		fixed_background();
+		first_time=false;
 	}
 	glutPostRedisplay();
 }
 
+void leer_centroides(size_t n){
+	centroides.resize(n);
+	for(size_t K=0; K<n; ++K)
+		cin>>centroides[K][0]>>centroides[K][1];
+}
+
+void leer_patrones(size_t n){
+	points.resize(n);
+	clase.resize(n);
+	for(size_t K=0; K<n; ++K)
+		cin>>points[K][0]>>points[K][1]>>clase[K];
+}

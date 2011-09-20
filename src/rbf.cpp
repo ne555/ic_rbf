@@ -2,11 +2,12 @@
 #include "util.h"
 
 #include <fstream>
+#include <iostream>
 
 using namespace std;
 
 RBF::RBF (int neuronas_capa_gaussiana, int neuronas_capa_salida, int n_entradas, float eta) {
-    capa_gaussiana.resize(neuronas_capa_gaussiana); 
+    capa_gaussiana.resize(neuronas_capa_gaussiana, neurona_rbf(n_entradas) ); 
     capa_salida.resize(
             neuronas_capa_salida, 
             neurona(neuronas_capa_gaussiana, eta) // inicializacion de la neurona
@@ -28,6 +29,7 @@ vector<float> RBF::calcular_intermedio (vector<float> & entrada) {
         intermedio[i] = capa_gaussiana[i].calcular(entrada);
     }
     intermedio[ncg] = 1; // entrada aumentada
+
     return intermedio;
 }
 
@@ -53,6 +55,7 @@ void RBF::read (const char *filename) {
 
     fstream file (filename, fstream::in);    
     file >> n;
+	cerr << "Cantidad de patrones " << n << '\n';
     input.resize(n, vector<float>(entradas));
     result.resize(n, vector<float>(ncs));
 
@@ -82,6 +85,13 @@ void RBF::entrenar_capa_gaussiana () {
     int ind;
     bool cambio;
 
+	cerr << "Inicio del entrenamiento\n" << 
+	"Neuronas en la capa gaussiana " << ncg << ' ' << capa_gaussiana.size() << '\n' <<
+	"Tamanio de la entrada " << input.size() << 'x' << input[0].size() << '\n' << 
+	"...";
+
+	
+
     while (true) {
         vector<vector<float> > centroides_acumulados(ncg, vector<float>(entradas, 0));
         vector<int> cantidad_centroides(ncg, 0);
@@ -99,6 +109,7 @@ void RBF::entrenar_capa_gaussiana () {
             if (capa_gaussiana[i].set_centroid(centroides_acumulados[i])) cambio = true;
         }
 
+		//graph();
         if (!cambio) break;
     }
     //TODO varianza
@@ -113,7 +124,12 @@ int RBF::entrenar_capa_salida (int cant_epocas, float acierto_minimo) {
 
         for (int i = 0; i < input.size(); i++) { // por cada patron de entrenamiento
             intermedio = calcular_intermedio(input[i]);
-            salida_obtenida = calcular_salida_con_intermedio(intermedio);
+			for(size_t K=0; K<intermedio.size(); ++K)
+				cout << intermedio[K] << ' ';
+			cout << endl;
+			continue;
+            
+			salida_obtenida = calcular_salida_con_intermedio(intermedio);
             if (comparar_vectores(salida_obtenida, result[i])) { // si acierta
                 aciertos++;
             } 
@@ -152,3 +168,11 @@ int RBF::centroide_mas_cerca (vector<float> & punto) {
 
     return i_min;
 }
+
+void RBF::graph() const{
+	cerr << "Graficando ";
+	cout << ncg << endl;
+	for(size_t K=0; K<capa_gaussiana.size(); ++K)
+		capa_gaussiana[K].graph();
+}
+

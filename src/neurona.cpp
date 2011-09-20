@@ -20,6 +20,6 @@ void neurona::entrenar (vector<float> & entradas, float error) {
 
 void neurona::inicializar () {
     for (int i = 0; i < weights.size(); i++) {
-        weights[i] = randomize(-0.5, 0.5);
+        weights[i] = randomize(-0.5f, 0.5f);
     }
 }
