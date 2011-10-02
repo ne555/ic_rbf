@@ -21,12 +21,13 @@ const float
 	light_green[] = {0.75, 1, 0.75, 1}, 
 	light_blue[]  = {0.75, 0.75, 1, 1};
 
-enum estado { Patrones=-1, Centroide=-2 };
+enum estado { Patrones=-1, Centroide=-2, Entrenamiento=-3 };
 
 typedef void  (*cargar_dato)(size_t);
 
 void leer_centroides(size_t n);
 void leer_patrones(size_t n);
+void leer_entrenamiento(size_t n);
 
 struct point{
 	float x[2];
@@ -41,12 +42,12 @@ struct point{
 int width=480, height=480;
 
 //vector< vector<float> > points;
-vector<point> points, centroides;
-vector<int> clase;
+vector<point> points, centroides, train;
+vector<int> clase, clase_train;
 
 void display();
 void reshape(int w, int h);
-void draw(int id);
+void draw(int id, const vector<point> &v, const vector<int> &c);
 void draw_centroides();
 void axis(const float *color);
 void wait_for_input();
@@ -76,41 +77,26 @@ void init(){
 	glScaled(factor,factor,factor);
 	
 	glLineWidth(4);
-	glPointSize(3);
+	glPointSize(1);
 }
 
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	glPointSize(1);
 	glColor3fv(blue);
-	draw(-1);
-	glColor3fv(red);
-	draw(1);
+	draw(-1, points, clase);
 
 	glColor3fv(black);
 	draw_centroides();
-	glutSwapBuffers();
-}
 
-void fixed_background(){
 	glPointSize(5);
+	glColor3fv(dark_blue);
+	draw(-1, train, clase_train);
+	glColor3fv(red);
+	draw(1, train, clase_train);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_ACCUM_BUFFER_BIT);
-
-	glStencilFunc(GL_ALWAYS, 0, ~0);
-	glStencilOp(GL_KEEP,GL_ZERO,GL_ZERO);
-
-	//axis(black);
-	glColor3fv(red); draw(1);
-	glColor3fv(dark_blue); draw(-1);
-
-	glColor3fv(blue);
-
-	glStencilFunc(GL_EQUAL, 1, ~0);
-	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
-	glAccum(GL_LOAD, 1);
-
-	glPointSize(1);
+	glutSwapBuffers();
 }
 
 void reshape(int w, int h){
@@ -126,11 +112,11 @@ void reshape(int w, int h){
 	glutPostRedisplay();
 }
 
-void draw(int id){
+void draw(int id, const vector<point> &v, const vector<int> &c){
 	glBegin(GL_POINTS);{
-		for(size_t K=0; K<points.size(); ++K)
-			if(clase[K] == id)
-				glVertex2fv(points[K].x);
+		for(size_t K=0; K<v.size(); ++K)
+			if(c[K] == id)
+				glVertex2fv(v[K].x);
 	};glEnd();
 }
 
@@ -156,7 +142,6 @@ void axis(const float *color){
 }
 
 void wait_for_input(){
-	static bool first_time=false;
 	cargar_dato leer = NULL;
 	size_t n;
 	cin>>n; //compatibilidad con la prueba
@@ -182,12 +167,13 @@ void wait_for_input(){
 		leer = &leer_centroides;
 		//cerr << "Centroides\n";
 		break;
+	case Entrenamiento: 
+		cin>>n;
+		leer = &leer_entrenamiento;
+		//cerr << "Entrenamiento\n";
+		break;
 	}
 	leer(n);
-	if(first_time){
-		fixed_background();
-		first_time=false;
-	}
 	glutPostRedisplay();
 }
 
@@ -202,5 +188,11 @@ void leer_patrones(size_t n){
 	clase.resize(n);
 	for(size_t K=0; K<n; ++K)
 		cin>>points[K][0]>>points[K][1]>>clase[K];
-	
+}
+
+void leer_entrenamiento(size_t n){
+	train.resize(n);
+	clase_train.resize(n);
+	for(size_t K=0; K<n; ++K)
+		cin>>train[K][0]>>train[K][1]>>clase_train[K];
 }

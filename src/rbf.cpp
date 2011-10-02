@@ -68,6 +68,14 @@ void RBF::read (const char *filename, FILE *out) {
 			file.ignore(); //csv o ssv funciona
 		}
 	}
+
+	if(out){
+		fprintf(out, "-3\n");
+		fprintf(out, "%d\n", n);
+		for(size_t K=0; K<input.size(); ++K)
+			fprintf( out, "%f %f %d\n", input[K][0], input[K][1], int(result[K][0]) );
+		fflush(out);
+	}
 }
 
 void RBF::inicializar () {
