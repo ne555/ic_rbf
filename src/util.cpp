@@ -46,7 +46,7 @@ vector<float> sumar_vectores (vector<float> & a, vector<float> & b) {
 vector<float> restar_vectores (vector<float> & a, vector<float> & b) {
     vector<float> c(a.size());
     if (a.size() != b.size()) {
-        cerr << "restar_vectores: distinto size" << endl;
+        cerr << "restar_vectores: distinto size " << a.size() << ' ' << b.size() << endl;
         throw 1;
     }
 

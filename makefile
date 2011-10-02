@@ -1,5 +1,5 @@
 CXX = g++
-CPPFLAGS = -Wall -pedantic-errors -ggdb -pg
+CPPFLAGS = -Wall -pedantic-errors -ggdb 
 LIBRARIES_grapher = $(addprefix -l,GL GLU glut)
 LIBRARIES_rbf = 
 

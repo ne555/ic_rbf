@@ -14,14 +14,15 @@ public:
     vector<float> calcular_intermedio (vector<float> & entrada);
     vector<float> calcular_salida_con_intermedio (vector<float> & intermedio);
     vector<float> calcular_salida (vector<float> & entrada);
-    void read (const char *filename);
+    void read (const char *filename, FILE *out=NULL);
     void inicializar ();
-    void entrenar_capa_gaussiana ();
-    int entrenar_capa_salida (int cant_epocas, float acierto_minimo);
+    void entrenar_capa_gaussiana (FILE *out=NULL);
+    int entrenar_capa_salida (int cant_epocas, float acierto_minimo, FILE *out=NULL);
     int centroide_mas_cerca (vector<float> & punto);
-    void graph() const;
+    void graph(FILE *);
     void prueba ();
     void imprimir_centroides ();
+    void imprimir_centroides (FILE *out);
 
 private:
     vector<neurona_rbf> capa_gaussiana;

@@ -13,6 +13,7 @@ public:
     float gaussian (float x);
     float distancia2(vector<float> & punto);
     void graph() const;
+    void imprimir_centroide(FILE *out);
     void imprimir_centroide();
 
 private:

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <cstdlib>
+#include <cstdio>
 #include "rbf.h"
 using namespace std;
 
@@ -16,6 +17,7 @@ void usage (int status)
 		"-E float \t Velocidad de aprendizaje (eta)\n" << 
 		"-t int \t Cantidad de epocas en el entrenamiento\n" << 
 		"-s float \t Porcentaje de acierto deseado\n" << 
+		"-g \t Grafica la evolucion del sistema\n" << 
 		"-h \t Ayuda del programa\n";
 	}
 
@@ -28,7 +30,8 @@ int main (int argc, char **argv) {
     float eta = 0.05, success = 0.9;
     int option, resultado_entrenamiento;
     const char *train_file, *test_file;
-    while( (option=getopt(argc, argv, "e:p:E:t:s:h")) != -1 ){
+	FILE *out=NULL;
+    while( (option=getopt(argc, argv, "e:p:E:t:s:gh")) != -1 ){
             switch(option){
             case 'e': train_file=optarg; break;
             case 'p': test_file=optarg; break;
@@ -36,6 +39,7 @@ int main (int argc, char **argv) {
             case 't': epocas=strtol(optarg, NULL, 10); break;
             case 's': success=strtof(optarg, NULL); break;
             case 'h': usage(EXIT_SUCCESS); break;
+			case 'g': if(not out) out=popen("./bin/grapher", "w");break;
             default: usage(EXIT_FAILURE);
             }
     }
@@ -46,10 +50,11 @@ int main (int argc, char **argv) {
     srand(time(NULL));
 
     RBF red(entradas, ncg, ncs, eta);
-    red.read(train_file);
+    red.read(train_file, out);
     red.inicializar();
-    red.entrenar_capa_gaussiana();
-    resultado_entrenamiento = red.entrenar_capa_salida(epocas, success);
+    red.entrenar_capa_gaussiana(out);
+    red.imprimir_centroides(out); cout << endl;
+    resultado_entrenamiento = red.entrenar_capa_salida(epocas, success, out);
 
     cout << "Resultado entrenamiento: " << resultado_entrenamiento << endl << endl;
     cout << "Centroides:" << endl;
@@ -57,7 +62,7 @@ int main (int argc, char **argv) {
     cout << "--------------------" << endl << endl;
     //red.prueba();
 
-
+	if(out) pclose(out);
     return 0;
 }
 

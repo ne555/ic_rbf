@@ -67,7 +67,6 @@ void init(){
 	glutInitWindowSize(width,height); glutInitWindowPosition(50,50);
 	glutCreateWindow("Graficador de puntos de colores");
 	glutDisplayFunc(display);
-	//glutReshapeFunc(reshape);
 	glutIdleFunc(wait_for_input);
 
 	glClearColor( white[0], white[1], white[2], 1);
@@ -76,20 +75,20 @@ void init(){
 	const float factor=0.5;
 	glScaled(factor,factor,factor);
 	
-	//glEnable(GL_STENCIL_TEST);
-	//glClearStencil(1);
 	glLineWidth(4);
+	glPointSize(3);
 }
 
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT);
-	//glStencilFunc(GL_EQUAL, 0, ~0);
-	//glAccum(GL_RETURN, 1);
-	draw_centroides();
-	//glStencilFunc(GL_EQUAL, 1, ~0);
 
 	glColor3fv(blue);
 	draw(-1);
+	glColor3fv(red);
+	draw(1);
+
+	glColor3fv(black);
+	draw_centroides();
 	glutSwapBuffers();
 }
 
@@ -111,7 +110,7 @@ void fixed_background(){
 	glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
 	glAccum(GL_LOAD, 1);
 
-	glPointSize(3);
+	glPointSize(1);
 }
 
 void reshape(int w, int h){
@@ -130,13 +129,12 @@ void reshape(int w, int h){
 void draw(int id){
 	glBegin(GL_POINTS);{
 		for(size_t K=0; K<points.size(); ++K)
-			//if(clase[K] == id)
+			if(clase[K] == id)
 				glVertex2fv(points[K].x);
 	};glEnd();
 }
 
 void draw_centroides(){
-	cerr  << '*';
 	glPointSize(7);
 	glColor3fv(black);
 	glBegin(GL_POINTS);{
@@ -158,7 +156,7 @@ void axis(const float *color){
 }
 
 void wait_for_input(){
-	static bool first_time=true;
+	static bool first_time=false;
 	cargar_dato leer = NULL;
 	size_t n;
 	cin>>n; //compatibilidad con la prueba
@@ -177,10 +175,12 @@ void wait_for_input(){
 	case Patrones: 
 		cin>>n;
 		leer = &leer_patrones;
+		//cerr << "Patrones\n";
 		break;
 	case Centroide: 
 		cin>>n;
 		leer = &leer_centroides;
+		//cerr << "Centroides\n";
 		break;
 	}
 	leer(n);
@@ -202,4 +202,5 @@ void leer_patrones(size_t n){
 	clase.resize(n);
 	for(size_t K=0; K<n; ++K)
 		cin>>points[K][0]>>points[K][1]>>clase[K];
+	
 }

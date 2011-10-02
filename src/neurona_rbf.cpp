@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <cstdio>
 #include "util.h"
 #include "neurona_rbf.h"
 
@@ -42,8 +43,10 @@ void neurona_rbf::graph() const{
 }
 
 void neurona_rbf::imprimir_centroide() {
-    for (int i = 0; i < centroid.size(); i++) {
-        cout << centroid[i] << " ";
-    }
+    for (int i = 0; i < centroid.size(); i++) 
+    	cout << centroid[i] << " ";
     cout << endl;
+}
+void neurona_rbf::imprimir_centroide(FILE *out) {
+	fprintf(out, "%f %f\n", centroid[0], centroid[1]);
 }

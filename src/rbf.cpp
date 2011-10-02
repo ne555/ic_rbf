@@ -49,7 +49,7 @@ vector<float> RBF::calcular_salida (vector<float> & entrada) {
     return salida;
 }
 
-void RBF::read (const char *filename) {
+void RBF::read (const char *filename, FILE *out) {
 	int n;
 
     fstream file (filename, fstream::in);    
@@ -79,7 +79,7 @@ void RBF::inicializar () {
     }
 }
 
-void RBF::entrenar_capa_gaussiana () {
+void RBF::entrenar_capa_gaussiana (FILE *out) {
     int ind;
     bool cambio;
 
@@ -108,7 +108,7 @@ void RBF::entrenar_capa_gaussiana () {
     //TODO calcular varianza
 }
 
-int RBF::entrenar_capa_salida (int cant_epocas, float acierto_minimo) {
+int RBF::entrenar_capa_salida (int cant_epocas, float acierto_minimo, FILE *out) {
     vector<float> intermedio, salida_obtenida;
     int epoca, aciertos;
 
@@ -127,6 +127,8 @@ int RBF::entrenar_capa_salida (int cant_epocas, float acierto_minimo) {
                 }
             }
         }
+
+		graph(out);
 
         // si el porcentaje de aciertos es el deseado, salgo
         if ( (float(aciertos)/input.size()) >= acierto_minimo) break;
@@ -171,14 +173,32 @@ int RBF::centroide_mas_cerca (vector<float> & punto) {
     return i_min;
 }
 
-void RBF::graph() const{
-	cout << ncg << endl;
-	for(size_t K=0; K<capa_gaussiana.size(); ++K)
-		capa_gaussiana[K].graph();
+void RBF::graph(FILE *out){
+	if(not out) return;
+	const size_t n=200;
+	const float limit=2.f;
+	fprintf(out, "-1\n");
+	fprintf(out, "%lu\n", n*n);
+	for(size_t K=0; K<n; ++K){
+		for(size_t L=0; L<n; ++L){
+			float x = K/float(n)*limit*2 - limit, y = L/float(n)*limit*2 - limit;
+			vector<float> v(2);
+			v[0] = x; v[1] = y;// v[2] = 1;
+			int salida = signo(calcular_salida(v)[0]);
+			fprintf( out, "%f %f %d\n", v[0], v[1], salida );
+		}
+	}
+	fflush(out);
 }
 
 void RBF::imprimir_centroides () {
-    for (int i = 0; i < ncg; i++) {
+    for (int i = 0; i < ncg; i++) 
         capa_gaussiana[i].imprimir_centroide();
-    }
+}
+
+void RBF::imprimir_centroides (FILE *out) {
+	fprintf(out, "-2\n");
+	fprintf(out, "%d\n", ncg);
+    for (int i = 0; i < ncg; i++) 
+        capa_gaussiana[i].imprimir_centroide(out);
 }
