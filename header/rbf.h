@@ -20,7 +20,7 @@ public:
     int entrenar_capa_salida (int cant_epocas, float acierto_minimo, FILE *out=NULL);
     int centroide_mas_cerca (vector<float> & punto);
     void graph(FILE *);
-    void prueba ();
+    float prueba ();
     void imprimir_centroides ();
     void imprimir_centroides (FILE *out);
 

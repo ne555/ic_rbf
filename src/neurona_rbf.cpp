@@ -48,5 +48,6 @@ void neurona_rbf::imprimir_centroide() {
     cout << endl;
 }
 void neurona_rbf::imprimir_centroide(FILE *out) {
+	if (not out) return;
 	fprintf(out, "%f %f\n", centroid[0], centroid[1]);
 }

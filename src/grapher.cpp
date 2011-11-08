@@ -1,4 +1,4 @@
-#include <iostream>
+#include <iostream> 
 #include <string>
 #include <vector>
 #include <limits>
@@ -84,17 +84,19 @@ void display(){
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glPointSize(1);
-	glColor3fv(blue);
+	glColor3fv(green);
 	draw(-1, points, clase);
 
+
+	//glPointSize(5);
+	//glColor3fv(dark_green);
+	//draw(-1, train, clase_train);
+	//glColor3fv(red);
+	//draw(1, train, clase_train);
+
+	glPointSize(10);
 	glColor3fv(black);
 	draw_centroides();
-
-	glPointSize(5);
-	glColor3fv(dark_blue);
-	draw(-1, train, clase_train);
-	glColor3fv(red);
-	draw(1, train, clase_train);
 
 	glutSwapBuffers();
 }

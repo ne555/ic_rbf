@@ -28,6 +28,7 @@ int main (int argc, char **argv) {
     int ncg, ncs, entradas;
     int epocas = 200;
     float eta = 0.05, success = 0.9;
+	float acierto;
     int option, resultado_entrenamiento;
     const char *train_file, *test_file;
 	FILE *out=NULL;
@@ -53,14 +54,12 @@ int main (int argc, char **argv) {
     red.read(train_file, out);
     red.inicializar();
     red.entrenar_capa_gaussiana(out);
-    red.imprimir_centroides(out); cout << endl;
+    //red.imprimir_centroides(out); cout << endl;
     resultado_entrenamiento = red.entrenar_capa_salida(epocas, success, out);
 
-    cout << "Resultado entrenamiento: " << resultado_entrenamiento << endl << endl;
-    cout << "Centroides:" << endl;
-    red.imprimir_centroides(); cout << endl;
-    cout << "--------------------" << endl << endl;
-    //red.prueba();
+	if (resultado_entrenamiento == -1) cout << "NoConvergencia "; else cout << "Convergencia ";
+    acierto = red.prueba();
+	cout << acierto << " " << resultado_entrenamiento << endl;
 
 	if(out) pclose(out);
     return 0;

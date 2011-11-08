@@ -126,20 +126,22 @@ int RBF::entrenar_capa_salida (int cant_epocas, float acierto_minimo, FILE *out)
         for (int i = 0; i < input.size(); i++) { // por cada patron de entrenamiento
             intermedio = calcular_intermedio(input[i]);
             salida_obtenida = calcular_salida_con_intermedio(intermedio);
-            if (comparar_vectores(salida_obtenida, result[i])) { // si acierta
+
+            /*if (comparar_vectores(salida_obtenida, result[i])) { // si acierta
                 aciertos++;
-            } 
-            else { // si no son iguales, entreno las neuronas
+            } */
+            //else { // si no son iguales, entreno las neuronas
                 for (int j = 0; j < ncs; j++) {
                     capa_salida[j].entrenar(intermedio, result[i][j] - salida_obtenida[j]);
-                }
+            //    }
             }
         }
 
 		graph(out);
 
         // si el porcentaje de aciertos es el deseado, salgo
-        if ( (float(aciertos)/input.size()) >= acierto_minimo) break;
+        //if ( (float(aciertos)/input.size()) >= acierto_minimo) break;
+        if ( prueba() >= acierto_minimo) break;
     }
 
     if (epoca <= cant_epocas) { // si convergio
@@ -150,18 +152,23 @@ int RBF::entrenar_capa_salida (int cant_epocas, float acierto_minimo, FILE *out)
     }
 }
 
-void RBF::prueba () {
+float RBF::prueba () {
+	int aciertos = 0;
     vector<float> salida;
     for (int i = 0; i < input.size(); i++) { // por cada patron de entrenamiento
         salida = calcular_salida(input[i]);
-        cout << "Entrada " << i << ":" << endl;
-        imprimir_vector(input[i]);
-        cout << "Salida esperada " << i << ":" << endl;
-        imprimir_vector(result[i]);
-        cout << "Salida " << i << ":" << endl;
-        imprimir_vector(salida);
-        cout << endl;
+        //cout << "Entrada " << i << ":" << endl;
+        //imprimir_vector(input[i]);
+        //cout << "Salida esperada " << i << ":" << endl;
+        //imprimir_vector(result[i]);
+        //cout << "Salida " << i << ":" << endl;
+        //imprimir_vector(salida);
+        //cout << endl;
+		if (comparar_vectores(salida, result[i])) {
+			aciertos++;
+		}
     }
+	return float(aciertos) / input.size();
 }
 
 int RBF::centroide_mas_cerca (vector<float> & punto) {
@@ -185,15 +192,19 @@ void RBF::graph(FILE *out){
 	if(not out) return;
 	const size_t n=200;
 	const float limit=2.f;
-	fprintf(out, "-1\n");
-	fprintf(out, "%lu\n", n*n);
+	if (out) {
+		fprintf(out, "-1\n");
+		fprintf(out, "%lu\n", n*n);
+	}
 	for(size_t K=0; K<n; ++K){
 		for(size_t L=0; L<n; ++L){
 			float x = K/float(n)*limit*2 - limit, y = L/float(n)*limit*2 - limit;
 			vector<float> v(2);
 			v[0] = x; v[1] = y;// v[2] = 1;
 			int salida = signo(calcular_salida(v)[0]);
-			fprintf( out, "%f %f %d\n", v[0], v[1], salida );
+			if (out) {
+				fprintf( out, "%f %f %d\n", v[0], v[1], salida );
+			}
 		}
 	}
 	fflush(out);
@@ -205,8 +216,10 @@ void RBF::imprimir_centroides () {
 }
 
 void RBF::imprimir_centroides (FILE *out) {
-	fprintf(out, "-2\n");
-	fprintf(out, "%d\n", ncg);
+	if (out) {
+		fprintf(out, "-2\n");
+		fprintf(out, "%d\n", ncg);
+	}
     for (int i = 0; i < ncg; i++) 
         capa_gaussiana[i].imprimir_centroide(out);
 }
